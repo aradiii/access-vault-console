@@ -1,0 +1,65 @@
+// Prisma schema for Remote Desktop Operations Console
+// Single source of truth: the Credential (vault entry) IS the fleet node.
+// Demo/simulated endpoints were removed — all statuses come from real TCP probes.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model ProbeRecord {
+  id           String     @id @default(cuid())
+  credentialId String
+  credential   Credential @relation(fields: [credentialId], references: [id], onDelete: Cascade)
+  status       String // online | degraded | offline
+  latency      Int?
+  timestamp    DateTime   @default(now())
+
+  @@index([credentialId, timestamp])
+}
+
+model Activity {
+  id        String   @id @default(cuid())
+  text      String
+  timestamp DateTime @default(now())
+}
+
+model Setting {
+  key   String @id
+  value String
+}
+
+model Credential {
+  id          String        @id @default(cuid())
+  host        String
+  port        Int           @default(3389)
+  domain      String
+  username    String
+  password    String
+  notes       String        @default("")
+  cores       Int?
+  ramGb       Int?
+  status      String        @default("unknown") // online | degraded | offline | unknown
+  latency     Int?
+  lastChecked DateTime?
+  osName       String? // friendly Windows product name, auto-detected via NLA
+  osVersion    String? // raw NTLM product version, e.g. "10.0.20348"
+  computerName String? // NetBIOS computer name leaked by the NTLM challenge
+
+  // --- Monitor agent telemetry (self-reported by the Windows agent) ---------
+  agentToken        String?   @unique // bearer token the agent presents
+  lastAgentReportAt DateTime? // last accepted agent report
+  cpuLoad           Int?      // last reported CPU usage %
+  memUsedPercent    Int?      // last reported physical memory usage %
+  uptimeSec         Int?      // last reported machine uptime in seconds
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  probes      ProbeRecord[]
+
+  @@index([domain])
+  @@index([host])
+}

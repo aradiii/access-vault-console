@@ -1,0 +1,36 @@
+# dependencies
+node_modules/
+
+# platform / tooling
+skills/
+tool-results/
+.shots/
+.dl/
+upload/
+download/
+
+# next.js build output
+.next/
+
+# logs
+dev.log
+server.log
+*.log
+
+# environment
+.env
+
+# databases (contain live credentials — never publish)
+db/
+*.db
+*.db-journal
+
+# generated HTML snapshots (embed fleet IPs)
+public/access-vault.html
+public/access-vault-lite.html
+
+# internal ops notes
+worklog.md
+
+# misc
+*.tsbuildinfo

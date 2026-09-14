@@ -1,0 +1,5 @@
+{
+  "serverUrl": "PASTE-CONSOLE-URL-HERE",
+  "token": "PASTE-AGENT-TOKEN-HERE",
+  "intervalSec": 30
+}
